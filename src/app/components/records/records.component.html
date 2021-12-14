@@ -1,0 +1,41 @@
+<div class="root">
+  <div class="caseList">
+    <div class="h-5">
+      <mat-accordion displayMode="flat">
+        <mat-expansion-panel #ep *ngFor="let lawCase of caseList" (click)=onClick(lawCase,ep)
+          (dblclick)=onDblClickCase(lawCase)>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{lawCase.caseName}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <ng-template matExpansionPanelContent>
+            <ng-container *ngIf="state.label=='查询'">
+              <div class="item" *ngFor="let item of items" (click)="onItemClick(item);$event.stopPropagation();">
+                <div class='item_txt'><span style="color: red;">{{item.docNumber}}</span>:{{item.queryContent}}
+                </div>
+                <div class="btnDel" (click)="onDelete(item);$event.stopPropagation();"></div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="state.label=='冻结'">
+              <div class="item" *ngFor="let item of items" (click)="onItemClick(item);$event.stopPropagation();">
+                <div class='item_txt'><span [style.color]="item.unfreezeDocNumber ? 'green' : 'red'">{{item.docNumber}}</span>:{{item.freezeName}}->{{item.freezeNumber}}
+                </div>
+                <div class="btnDel" (click)="onDelete(item);$event.stopPropagation();"></div>
+              </div>
+            </ng-container>
+          </ng-template>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+
+  <div class="h-50 b-t-1">
+    <mat-form-field class="w100">
+      <mat-label>过滤</mat-label>
+      <input matInput [formControl]="caseFilterControl" autocomplete="off">
+    </mat-form-field>
+  </div>
+</div>

@@ -1,0 +1,162 @@
+<div #root class="w100 p-5">
+  <form class="flex-column w100" [formGroup]=group>
+    <div class='flex w100'>
+      <mat-form-field class='w-100 m-r-10'>
+        <mat-label>编号</mat-label>
+        <input matInput formControlName="docNumber">
+      </mat-form-field>
+
+      <mat-form-field class='w-300 m-r-10'>
+        <mat-label>填表时间：</mat-label>
+        <input formControlName="createDate" matInput [matDatepicker]="picker" placeholder="不填写为当天">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="flex1">
+        <mat-label>调取单位</mat-label>
+        <input matInput [matAutocomplete]=auto formControlName="company">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of companys$ | async" [value]="option.label">{{option.label}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="flex w100">
+      <mat-form-field class='flex2 m-r-10'>
+        <mat-label>财产种类</mat-label>
+        <input matInput [matAutocomplete]=auto2 formControlName="queryType">
+        <mat-autocomplete #auto2="matAutocomplete">
+          <mat-option *ngFor="let option of queryTypes" [value]="option">{{option}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field class='flex1 m-r-10'>
+        <mat-label>办案人员2</mat-label>
+        <input matInput [matAutocomplete]=autoUser1 formControlName="requestUser1">
+        <mat-autocomplete #autoUser1="matAutocomplete">
+          <mat-option *ngFor="let user of users" [value]="user.name">{{user.name}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <mat-form-field class='flex1'>
+        <mat-label>办案人员2</mat-label>
+        <input matInput [matAutocomplete]=autoUser2 formControlName="requestUser2">
+        <mat-autocomplete #autoUser2="matAutocomplete">
+          <mat-option *ngFor="let user of users" [value]="user.name">{{user.name}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="w100 flex">
+      <mat-form-field class='flex1'>
+        <mat-label>查询线索</mat-label>
+        <textarea #evidence matInput cdkTextareaAutosize formControlName="queryContent" autocomplete='off'></textarea>
+      </mat-form-field>
+      <button mat-button (click)=clear() class= 'w-100'>表单重置</button>
+    </div>
+  </form>
+
+  <div class='w100 flex center m-b-10 h-50' style="border-bottom: 4px dashed blue; font-size:20px;">以下为手续预览</div>
+
+  <div class="w-800 h-1060 p-100 bg-azure">
+    <div #tzs class="flex-column w-600 h-860" style="font-size: 22px; font-family: FangSong; line-height: 35px;">
+      <div style="text-align:center;font-size:16px;font-family: FangSong;line-height: 18px;">{{lawCase?.caseNumber}}</div>
+      <div class="full flex-column b-4">
+        <div class="b-2 flex-column m-2 p-5 flex1">
+          <div class="h-20"></div>
+          <!-- 标题 -->
+          <div class="flex-column h-80 center">
+            <span style="font-family: SimHei; font-size: 25px; letter-spacing: 1px;">{{unit}}</span>
+            <span style="font-family: SimHei; font-size: 30px;">协助查询财产通知书</span>
+          </div>
+          <!-- 文书编号 -->
+          <div class="right h-80 m-r-10">{{unit_1}}（{{unit_3}}）查财字〔{{year}}〕{{docNumber}}号</div>
+          <!-- 查询单位 -->
+          <div class="left h-40 left">
+            <span class="under-line">{{company}}:</span>
+          </div>
+          <!-- 第一段 -->
+          <div>
+            &nbsp;&nbsp;&nbsp;&nbsp;因侦查犯罪需要，根据《中华人民共和国刑事诉讼法》第一百四十四条之规定，我局派员前往你处查询犯罪嫌疑人
+            <span
+              class="under-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            （性别<span class='under-line'>&nbsp;&nbsp;&nbsp;&nbsp;</span>，出生日期<span
+              class='under-line'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>）
+            的财产，请予以协助。
+          </div>
+          <!-- 财产种类 -->
+          <div class="flex">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;财产种类：</div>
+            <div class='flex1 under-line'>{{queryType}}</div>
+          </div>
+          <!-- 查询线索 由于pdf渲染一个span只显示一个下划线，所以-->
+          <div class='p-t-10 ' style='word-break: break-all; max-height: 220px; overflow: hidden'>&nbsp;&nbsp;&nbsp;&nbsp;查询线索：
+            <span class='under-line' *ngFor='let item of getQueryContent()' [innerHTML]="item"></span>
+          </div>
+
+          <div class='p-t-50' style="position: relative;">
+            <div class='right m-r-50'>{{unit}}</div>
+            <div class='right m-r-50'>{{toChineseDate(createDate)}}</div>
+            <img *ngIf = "isSeal" src="assets/seal.png" width="151px" height="151px"
+              style="position: absolute; top: 40px; left: 400px;" />
+          </div>
+          <div class='h-80'></div>
+        </div>
+      </div>
+      <div class="left m-l-50">此联交协助单位</div>
+    </div>
+  </div>
+  <div class='h-5'></div>
+  <div class="w-800 h100 p-100 bg-azure">
+    <div #bgs class="flex-column w-600" style="font-size: 22px; font-family: FangSong; line-height: 35px;">
+      <div class="flex h-120 w100">
+        <div class="w-55 b-t-2 b-r-1 b-b-1 p-l-15 p-t-5 center" style="line-height:1.2em">
+          领<br>导<br>批<br>示
+        </div>
+        <div class="flex1 b-t-2 b-b-1 center" style="position:relative;">
+          <div style="position: absolute; top: 10px; left: 10px;">同意查询</div>
+          <div style="position: absolute; bottom: 0px; right: 20px;">{{createDate_str}}</div>
+          <img *ngIf = "isSeal" src="assets/seal.png" width="151px" height="151px" style="position: absolute; top: 0px; left: 400px;">
+          <img src="assets/juzhang.png" width="70px" height="70px" style="position: absolute; top: 35px; left: 400px;">
+        </div>
+      </div>
+
+      <div class="flex h-120 w100">
+        <div class="w-55 b-b-2 b-r-1 p-l-15 p-t-5" style="line-height:1.2em">
+          单<br>位<br>意<br>见
+        </div>
+        <div class="flex1 b-b-2" style="position:relative;">
+          <div style="position: absolute; top: 10px; left: 10px;">建议查询</div>
+          <div style="position: absolute; bottom: 0px; right: 20px;">{{createDate_str}}</div>
+          <img *ngIf = "isSeal" src="assets/xingjingdui.png" width="151px" height="151px"
+            style="position: absolute; top: 0px; left: 400px;">
+          <img src="assets/duizhang.png" width="70px" height="70px" style="position: absolute; top: 35px; left: 400px;">
+        </div>
+      </div>
+
+      <div class="flex h-110 w100 center" style="font-family: SimHei; font-size: 30px;">
+        呈请查询财产报告书
+      </div>
+
+      <div>
+        <p>现呈请对{{lawCase?.caseName}}进行财产查询，理由如下：</p>
+        <p>{{lawCase?.caseContent}}</p>
+        <p>现呈请查询以下内容：{{queryContent}}</p>
+        <p>综上所述,根据《中华人民共和国刑事诉讼法》第一百四十四条之规定，拟对{{lawCase?.caseName}}进行财产查询。</p>
+        <p>以上报告妥否，请批示。</p>
+      </div>
+
+      <div class="flex-column p-r-50" style="position:relative">
+        <div class='w100 right'>{{unit}}{{unit_2}}</div>
+        <div class='w100 right p-r-130'>承办人</div>
+        <div class="right">{{toChineseDate(createDate)}}</div>
+        <img [attr.src]=signal_minjing1 width="70px" height="70px" style="position: absolute; top: 20px; left: 420px;">
+        <img [attr.src]=signal_minjing2 width="70px" height="70px" style="position: absolute; top: 20px; left: 510px;">
+      </div>
+
+    </div>
+  </div>
+
+
+</div>

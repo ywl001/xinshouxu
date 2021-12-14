@@ -1,0 +1,6 @@
+{
+    "/jlssx": {
+        "target": "http://localhost",
+        "secure": false
+    }
+}
