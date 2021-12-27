@@ -1,0 +1,44 @@
+<div class="root">
+  <div class='left'>
+    <div class='w100 h-50'>
+      <button mat-raised-button color='primary' class="full" (click)=onAddCase()>添加案件</button>
+    </div>
+    <div class='flex1'>
+      <app-records [shouxuType]="currentShouxuType"></app-records>
+    </div>
+  </div>
+  <div class='right'>
+    <div class='right-top'>
+      <mat-radio-group class="radio-group" [formControl]="stateControl">
+        <mat-radio-button class="radio-button" *ngFor="let shouxuType of shouxuTypes" [value]="shouxuType">
+          {{shouxuType.label}}
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <div #rightContainer class='right-middle'>
+      <div class="lawCase w100 p-10" *ngIf="currentCase$|async as currentCase">
+        <p><span>{{currentCase.caseNumber}}</span>－－－－<span>{{currentCase.caseName}}</span></p>
+        <p>{{currentCase.caseContent}}</p>
+        <div class="flex">
+          <div class="clip" matTooltip="复制案件编号" (cbOnSuccess)="onCbSuccess()" ngxClipboard
+            [cbContent]="currentCase.caseNumber"></div>
+          <div class="clip" matTooltip="复制案件名称" (cbOnSuccess)="onCbSuccess()" ngxClipboard
+            [cbContent]="currentCase.caseName"></div>
+          <div class="clip" matTooltip="复制案件内容" (cbOnSuccess)="onCbSuccess()" ngxClipboard
+            [cbContent]="currentCase.caseContent">
+          </div>
+        </div>
+      </div>
+
+      <template #shouxuContainer id="shouxuContainer"></template>
+    </div>
+
+    <div class='right-bottom'>
+      <button mat-raised-button color='primary' (click)='onSaveData()'>保存</button>
+      <button mat-raised-button color='accent' (click)='onSaveImage()'>存图</button>
+      <mat-checkbox [formControl]="sealControl">印章</mat-checkbox>
+    </div>
+  </div>
+
+</div>

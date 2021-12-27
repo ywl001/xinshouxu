@@ -1,0 +1,259 @@
+<div #root class="w100 p-5">
+  <form class="flex-column w100" [formGroup]=group>
+    <div class='line'>
+      <mat-form-field class="w-100">
+        <mat-label>编号</mat-label>
+        <input matInput formControlName="docNumber">
+      </mat-form-field>
+
+      <div class="m-r-10 clip" *ngIf="docNumber" matTooltip="复制文书编号" (click)=copyDocNumber()>
+      </div>
+
+      <mat-form-field class='w-200'>
+        <mat-label>填表时间：</mat-label>
+        <input formControlName="createDate" matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class='flex1 m-r-10'>
+        <mat-label>办案人员1</mat-label>
+        <input matInput [matAutocomplete]=autoUser1 formControlName="requestUser1">
+        <mat-autocomplete #autoUser1="matAutocomplete">
+          <mat-option *ngFor="let user of users$|async" [value]="user.name">{{user.name}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <mat-form-field class='flex1'>
+        <mat-label>办案人员2</mat-label>
+        <input matInput [matAutocomplete]=autoUser2 formControlName="requestUser2">
+        <mat-autocomplete #autoUser2="matAutocomplete">
+          <mat-option *ngFor="let user of users$|async" [value]="user.name">{{user.name}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <ng-container *ngIf="!isNewCreate" class="flex1">
+        <button *ngIf="!isAddUnfreeze" mat-flat-button (click)="onAddUnfreeze()">添加解冻手续</button>
+        <div>
+          <mat-radio-group *ngIf="isAddUnfreeze" [formControl]="freezeState">
+            <mat-radio-button value='freeze' style="margin-right: 20px;">冻结</mat-radio-button>
+            <mat-radio-button value='unfreeze'>解冻</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="line">
+      <mat-form-field class="flex1">
+        <mat-label>金融机构名称：</mat-label>
+        <input matInput [matAutocomplete]=autoCompany formControlName="company">
+        <mat-autocomplete #autoCompany="matAutocomplete">
+          <mat-option *ngFor="let option of companys$ | async" [value]="option.label">{{option.label}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field class="flex1">
+        <mat-label>户名或权利人：</mat-label>
+        <input matInput formControlName='freezeName' autocomplete="off">
+      </mat-form-field>
+    </div>
+
+    <div class="line">
+      <mat-form-field class="flex1">
+        <mat-label>账号：</mat-label>
+        <input matInput formControlName='freezeNumber' autocomplete="off">
+      </mat-form-field>
+
+      <!-- <mat-form-field class="w-100">
+        <mat-label>账户级别：</mat-label>
+        <input matInput formControlName='level' type='number' min="1" max="100" autocomplete="off">
+      </mat-form-field> -->
+
+      <mat-form-field class="flex1">
+        <mat-label>冻结数额（大，小写）：</mat-label>
+        <input matInput formControlName='freezeMoney'>
+      </mat-form-field>
+
+      <button mat-button (click)=toDaxie()>转大写</button>
+      <button mat-button (click)=clear() class='w-100'>表单重置</button>
+    </div>
+  </form>
+
+  <div class='w100 flex center m-b-10 h-50' style="border-bottom: 4px dashed blue; font-size:20px;">以下为手续预览</div>
+
+  <div class="w-800 h-1100 p-100 bg-azure">
+    <div #tzs class="flex-column w-600 h-900" style="font-size: 22px; font-family: FangSong; line-height: 35px;">
+      <div style="text-align:center;font-size:16px;font-family: FangSong;line-height: 18px;">{{lawcase?.caseNumber}}
+      </div>
+      <div class="full b-4 flex-column">
+        <div class="b-2 flex-column m-2 p-5 flex1">
+          <div class="h-10"></div>
+          <!-- 标题 -->
+          <div class="flex-column h-70 center">
+            <span style="font-family: SimHei; font-size: 25px; letter-spacing: 1px;">{{unit$|async}}</span>
+            <span style="font-family: SimHei; font-size: 30px;">协助<span *ngIf="isUnfreezeState">解除</span>冻结财产通知书</span>
+          </div>
+          <!-- 文书编号 -->
+          <div class="right h-60 m-r-10">{{unit_1$|async}}（{{unit_3$|async}}）<span
+              *ngIf="isUnfreezeState">解</span>冻财字〔{{year_start}}〕{{docNumber}}号
+          </div>
+          <!-- 查询单位 -->
+          <div class="left h-30 left">
+            <span class="under-line">{{company}}:</span>
+          </div>
+          <!-- 第一段 -->
+          <!-- <div *ngIf="!isUnfreezeState">
+            <p>因侦查犯罪需要，根据《中华人民共和国刑事诉讼法》第一百四十四条之规定，请予冻结犯罪嫌疑人的下列财产：</p>
+          </div> -->
+          <div>
+            <p>根据《中华人民共和国刑事诉讼法》第一百四十{{isUnfreezeState ? "五" : "四"}}条之规定，请予<span
+                *ngIf=isUnfreezeState>解除</span>冻结犯罪嫌疑人<span class="under-line line_bg">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              </span>
+              （性别<span class='under-line line_bg'>&nbsp;&nbsp;&nbsp;&nbsp;</span>，出生日期<span
+                class='under-line line_bg'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>）的下列财产：
+            </p>
+          </div>
+          <!-- 类型 -->
+          <div class="flex line">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;类型（名称）</div>
+            <div class='flex1 under-line'>账户余额</div>
+          </div>
+
+          <div class="flex line">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;所在机构</div>
+            <div class='flex1 under-line'>{{company}}</div>
+          </div>
+          <div class="flex line">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;户名或权利人</div>
+            <div class='flex1 under-line'>{{freezeName}}</div>
+          </div>
+
+          <div class="flex line">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;账号等号码</div>
+            <div class='flex1 under-line' [style.fontSize]="freezeNumberFontSize">{{freezeNumber}}</div>
+          </div>
+
+          <div class="flex line">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;冻结金额</div>
+            <div class='flex1 under-line' *ngIf="!isUnfreezeState">{{freezeMoney}}</div>
+            <div class='flex1 under-line' *ngIf="isUnfreezeState">{{freezeMoney==='全额冻结'?'全额解除':freezeMoney}}</div>
+          </div>
+
+          <div class="flex line">
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;其他</div>
+            <div class='flex1 under-line'></div>
+          </div>
+
+          <div class="w100"
+            style="text-indent: 2em;display: block; text-align: left; padding-top: 5px;line-height: 1.5em;">
+            冻结时间从
+            <span class="under-line">{{year_start}}</span>年
+            <span class="under-line">{{month_start}}</span>月
+            <span class="under-line">{{day_start}}</span>日起至
+            <span class="under-line">{{year_end}}</span>年
+            <span class="under-line">{{month_end}}</span>月
+            <span class="under-line">{{day_end}}</span>日止
+          </div>
+
+          <div class='p-t-10' style="position: relative;">
+            <div class='right m-r-50'>{{unit$|async}}</div>
+            <div class='right m-r-50'>{{toChineseDate(createDate)}}</div>
+            <img *ngIf="isSeal$|async" src="assets/seal.png" width="151px" height="151px"
+              style="position: absolute; top: 10px; left: 400px;" />
+          </div>
+          <div class='h-80'></div>
+        </div>
+      </div>
+      <div class="left m-l-50">此联交协助单位</div>
+    </div>
+  </div>
+
+  <div class='h-5'></div>
+
+  <div class="w-800 h100 p-100 bg-azure">
+    <div #bgs class="flex-column w-600" style="font-size: 22px; font-family: FangSong; line-height: 35px;">
+      <div class="flex h-120 w100">
+        <div class="w-55 b-t-2 b-r-1 b-b-1 p-l-15 p-t-5 center" style="line-height:1.2em">
+          领<br>导<br>批<br>示
+        </div>
+        <div class="flex1 b-t-2 b-b-1 center" style="position:relative;">
+          <div style="position: absolute; top: 10px; left: 10px;">同意对涉案账户<span *ngIf='isUnfreezeState'>解除</span>冻结</div>
+          <div style="position: absolute; bottom: 0px; right: 20px;">{{createDate_str}}</div>
+          <img *ngIf="isSeal$|async" src="assets/seal.png" width="151px" height="151px"
+            style="position: absolute; top: 0px; left: 400px;">
+          <img src="assets/juzhang.png" width="70px" height="70px" style="position: absolute; top: 35px; left: 400px;">
+        </div>
+      </div>
+
+      <div class="flex h-120 w100">
+        <div class="w-55 b-b-1 b-r-1 p-l-15 p-t-5" style="line-height:1.2em">
+          审<br>核<br>意<br>见
+        </div>
+        <div class="flex1 b-b-1" style="position:relative;">
+          <div style="position: absolute; top: 10px; left: 10px;">建议对涉案账户<span *ngIf='isUnfreezeState'>解除</span>冻结</div>
+          <div style="position: absolute; bottom: 0px; right: 20px;">{{createDate_str}}</div>
+          <img *ngIf="isSeal$|async" src="assets/fazhi.png" width="150px" height="75px"
+            style="position: absolute; top: 0px; left: 400px;">
+          <img src="assets/fazhiduizhang.png" width="70px" height="70px"
+            style="position: absolute; top: 35px; left: 400px;">
+        </div>
+      </div>
+
+      <div class="flex h-120 w100">
+        <div class="w-55 b-b-1 b-r-1 p-l-15 p-t-5" style="line-height:1.2em">
+          单<br>位<br>意<br>见
+        </div>
+        <div class="flex1 b-b-1" style="position:relative;">
+          <div style="position: absolute; top: 10px; left: 10px;">建议对涉案账户<span *ngIf='isUnfreezeState'>解除</span>冻结</div>
+          <div style="position: absolute; bottom: 0px; right: 20px;">{{createDate_str}}</div>
+          <img *ngIf="isSeal$|async" src="assets/xingjingdui.png" width="151px" height="151px"
+            style="position: absolute; top: 0px; left: 400px;">
+          <img src="assets/duizhang.png" width="70px" height="70px" style="position: absolute; top: 35px; left: 400px;">
+        </div>
+      </div>
+
+      <div class="flex h-120 w100">
+        <div class="w-55 b-b-2 b-r-1 p-l-15 p-t-5" style="line-height:1.2em">
+          兼<br>职<br>法<br>制
+        </div>
+        <div class="flex1 b-b-2" style="position:relative;">
+          <div style="position: absolute; top: 10px; left: 10px;">建议对涉案账户<span *ngIf='isUnfreezeState'>解除</span>冻结</div>
+          <div style="position: absolute; bottom: 0px; right: 20px;">{{createDate_str}}</div>
+          <img src="assets/jianzhifazhi.png" width="70px" height="70px"
+            style="position: absolute; top: 35px; left: 400px;">
+        </div>
+      </div>
+
+      <div class="flex h-110 w100 center" style="font-family: SimHei; font-size: 30px;">
+        呈请<span *ngIf="isUnfreezeState">解除</span>冻结财产报告书
+      </div>
+
+      <div>
+        <!-- <div *ngIf="!isUnfreezeState">{{company}}账户{{freezeNumber}}，账户姓名:{{freezeName}}</div> -->
+
+        <p *ngIf="isUnfreezeState">现呈请对{{lawcase?.caseName}}涉案账户{{freezeNumber}}进行解除冻结财产，理由如下：</p>
+        <p *ngIf="!isUnfreezeState">现呈请对涉案账户{{freezeNumber}}涉案账户{{freezeNumber}}进行冻结财产，理由如下：</p>
+
+        <p>{{lawcase?.caseContent}}</p>
+        <p *ngIf="!isUnfreezeState">经查明，该案涉案资金流入账户{{freezeNumber}}，因此呈请对以下账户进行冻结财产：{{freezeNumber}}</p>
+        <p *ngIf="isUnfreezeState">经查，账户{{freezeNumber}}已排除涉案嫌疑，无继续冻结之必要，特呈请对该账户解除冻结。</p>
+        <p *ngIf="!isUnfreezeState">
+          综上所述,根据《中华人民共和国刑事诉讼法》第一百四十四条之规定，拟对{{lawcase?.caseName}}中{{company}}账户{{freezeNumber}}进行冻结财产。</p>
+        <p *ngIf="isUnfreezeState">
+          综上所述,根据《中华人民共和国刑事诉讼法》第一百四十五条之规定，拟对{{lawcase?.caseName}}中{{company}}账户{{freezeNumber}}进行解除冻结财产。</p>
+        <p>以上报告妥否，请批示。</p>
+      </div>
+
+      <div class="flex-column p-r-50" style="position:relative">
+        <div class='w100 right'>{{unit$|async}}{{unit_2$|async}}</div>
+        <div class='w100 right p-r-130'>承办人</div>
+        <div class="right">{{toChineseDate(createDate)}}</div>
+        <img [attr.src]=signal_minjing1 width="70px" height="70px" style="position: absolute; top: 20px; left: 420px;">
+        <img [attr.src]=signal_minjing2 width="70px" height="70px" style="position: absolute; top: 20px; left: 510px;">
+      </div>
+
+    </div>
+  </div>
+
+</div>

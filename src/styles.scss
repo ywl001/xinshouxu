@@ -1,0 +1,179 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-size: 16pt;
+}
+
+div {
+  box-sizing: border-box;
+}
+
+
+@for $i from 1 through 400 {
+  .w-#{$i*5} {
+    width: 5px * $i;
+  }
+}
+
+@for $i from 1 through 400 {
+  .h-#{$i*5} {
+    height: 5px * $i;
+  }
+}
+
+@each $b1,
+$b2 in (t:top, r:right, b:bottom, l:left) {
+  @each $i in (1, 2) {
+    .b-#{$b1}-#{$i} {
+      border-#{$b2}: $i+px solid black
+    }
+  }
+}
+
+@for $i from 1 through 10 {
+  .b-#{$i} {
+    border: $i+px solid black
+  }
+}
+
+@each $b1,
+$b2 in (t:top, r:right, b:bottom, l:left) {
+  @for $i from 1 through 50 {
+    .p-#{$b1}-#{$i*5} {
+      padding-#{$b2}: 5px * $i;
+    }
+  }
+}
+
+
+@for $i from 1 through 50 {
+  .p-#{$i*5} {
+    padding: 5px * $i;
+  }
+}
+
+@for $i from 1 through 50 {
+  .m-#{$i} {
+    margin: $i+px;
+  }
+}
+
+
+@each $b1,
+$b2 in (t:top, r:right, b:bottom, l:left) {
+  @for $i from 1 through 20 {
+    .m-#{$b1}-#{$i*5} {
+      margin-#{$b2}: 5px * $i;
+    }
+  }
+}
+
+@each $color in ('red','black','blue','green','aqua','pink','yellow','brown','gold','grey', 'azure') {
+  .bg-#{$color} {
+    background-color:#{$color}
+  }
+}
+
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  align-items: center;
+  justify-content: center;
+}
+
+.left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+.flex2 {
+  flex: 2
+}
+
+.w100 {
+  width: 100%
+}
+
+.h100 {
+  height: 100%
+}
+
+.full {
+  width: 100%;
+  height: 100%;
+}
+
+.under-line {
+  border-bottom: 1px solid black;
+  padding-bottom: 3px;
+}
+
+p {
+  text-indent: 2em;
+  padding: 0px;
+  margin: 0px;
+  word-break: break-all;
+  text-align: justify;
+}
+
+form {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+
+  >* {
+    padding-bottom: 10px;
+  }
+}
+
+.line {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 10px;
+
+  >* {
+    margin-right: 10px;
+  }
+}
+
+.line_bg {
+  background: url(assets/line.png) repeat-x;
+}
+
+.clip {
+  background-image: url('./assets/clipboard.svg');
+  width: 30px;
+  height: 30px;
+  background-size: cover;
+  margin-right: 20px;
+  cursor: pointer;
+
+  &:hover {
+    background-image: url('./assets/clipboard_over.svg');
+  }
+}

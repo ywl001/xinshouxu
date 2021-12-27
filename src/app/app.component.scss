@@ -1,0 +1,82 @@
+.root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  .left {
+    height: 100%;
+    width: 400px;
+    min-width: 400px;
+    border-right: 2px solid black;
+    display: flex;
+    flex-direction: column;
+
+    >* {
+      width: 100%
+    }
+
+    .left-bottom {
+      flex: 1;
+      overflow: hidden;
+    }
+  }
+
+  .right {
+    height: 100%;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    .right-top {
+      height: 50px;
+      width: 100%;
+      border-bottom: 1px solid black;
+      background-color: lavender;
+      display: flex;
+      align-items: center;
+
+      .radio-group {
+        display: inline-flex;
+        margin-left: 30px;
+      }
+
+      .radio-button {
+        margin-right: 15px;
+      }
+    }
+
+    .right-middle{
+      flex: 1;
+      width: 100%;
+      overflow:auto;
+    }
+
+    .right-bottom {
+      height: 50px;
+      width: 100%;
+      background-color: rgb(250, 241, 230);
+      padding: 10px;
+      border-top: 1px solid black;
+      /* padding-bottom: 5px; */
+
+      >button {
+        width: 100px;
+        margin-right: 30px;
+      }
+    }
+  }
+}
+
+
+
+.mat-flat-button,
+.mat-raised-button {
+  border-radius: 0;
+  // margin-bottom: -5px;
+}
+
+//移除表单字段下面的空白
+::ng-deep .mat-form-field-wrapper {
+  margin-bottom: -1em;
+}
+
+
